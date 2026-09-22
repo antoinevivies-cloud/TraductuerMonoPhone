@@ -1,0 +1,70 @@
+import SwiftUI
+
+struct ConversationView: View {
+    @EnvironmentObject private var model: ConversationModel
+
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section("Langues") {
+                    Picker("Interlocuteur 1", selection: $model.firstLanguage) {
+                        ForEach(SpokenLanguage.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    Picker("Canal 1", selection: $model.firstChannel) {
+                        ForEach(StereoChannel.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    Picker("Interlocuteur 2", selection: $model.secondLanguage) {
+                        ForEach(SpokenLanguage.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    Picker("Canal 2", selection: $model.secondChannel) {
+                        ForEach(StereoChannel.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                }
+
+                Section("Conversation") {
+                    Picker("Personne qui parle", selection: $model.activeSpeaker) {
+                        Text("Interlocuteur 1").tag(1)
+                        Text("Interlocuteur 2").tag(2)
+                    }
+                    .pickerStyle(.segmented)
+
+                    Button(model.captureButtonTitle) { model.startOrStop() }
+                        .frame(maxWidth: .infinity)
+                    Button("Changer d'interlocuteur") { model.switchSpeaker() }
+                        .frame(maxWidth: .infinity)
+
+                    Text(model.status).foregroundStyle(.secondary)
+                }
+
+                Section("Historique") {
+                    if model.lines.isEmpty {
+                        Text("Les transcriptions et traductions apparaîtront ici.")
+                            .foregroundStyle(.secondary)
+                    }
+                    ForEach(model.lines) { line in
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(line.source.rawValue).font(.caption).foregroundStyle(.secondary)
+                            Text(line.original)
+                            Text(line.translated).fontWeight(.semibold)
+                            Text("Sortie : \\(line.destination.rawValue)").font(.caption)
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Stereo Dash Voice")
+            .alert("Information", isPresented: Binding(
+                get: { model.errorMessage != nil },
+                set: { if !$0 { model.errorMessage = nil } }
+            )) {
+                Button("OK", role: .cancel) { model.errorMessage = nil }
+            } message: {
+                Text(model.errorMessage ?? "")
+            }
+        }
+    }
+}
+
+private extension ConversationModel {
+    var captureButtonTitle: String { captureIsRunning ? "Arrêter l'écoute" : "Démarrer l'écoute" }
+    var captureIsRunning: Bool { status.hasPrefix("Écoute") || status == "Traduction…" }
+}
