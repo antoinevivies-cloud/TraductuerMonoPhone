@@ -21,8 +21,8 @@ struct ConversationView: View {
                     }
                 }
 
-                Section("Conversation") {
-                    Picker("Personne qui parle", selection: $model.activeSpeaker) {
+                Section("Conversation — un tour à la fois") {
+                    Picker("Interlocuteur qui parle", selection: $model.activeSpeaker) {
                         Text("Interlocuteur 1").tag(1)
                         Text("Interlocuteur 2").tag(2)
                     }
@@ -30,9 +30,13 @@ struct ConversationView: View {
 
                     Button(model.captureButtonTitle) { model.startOrStop() }
                         .frame(maxWidth: .infinity)
-                    Button("Changer d'interlocuteur") { model.switchSpeaker() }
+
+                    Button("Passer au tour suivant") { model.switchSpeaker() }
                         .frame(maxWidth: .infinity)
 
+                    Text("1. Démarrer l'écoute · 2. Parler · 3. Passer au tour suivant.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                     Text(model.status).foregroundStyle(.secondary)
                 }
 
@@ -46,7 +50,7 @@ struct ConversationView: View {
                             Text(line.source.rawValue).font(.caption).foregroundStyle(.secondary)
                             Text(line.original)
                             Text(line.translated).fontWeight(.semibold)
-                            Text("Sortie : \\(line.destination.rawValue)").font(.caption)
+                            Text("Sortie : \(line.destination.rawValue)").font(.caption)
                         }
                     }
                 }
