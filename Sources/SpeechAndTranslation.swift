@@ -26,7 +26,7 @@ final class SpeechCapture {
         }
 
         let audioSession = AVAudioSession.sharedInstance()
-        try audioSession.setCategory(.record, mode: .measurement, options: [.duckOthers, .allowBluetooth])
+        try audioSession.setCategory(.playAndRecord, mode: .measurement, options: [.duckOthers, .allowBluetooth])
         try audioSession.setActive(true, options: .notifyOthersOnDeactivation)
 
         let recognitionRequest = SFSpeechAudioBufferRecognitionRequest()
@@ -70,10 +70,41 @@ protocol TranslationProviding {
     func translate(_ text: String, from: SpokenLanguage, to: SpokenLanguage) async throws -> String
 }
 
+/// Traducteur local de démonstration. Il ne prétend pas traduire du texte libre :
+/// seuls les exemples embarqués sont rendus dans l'autre langue.
+struct DemonstrationTranslationService: TranslationProviding {
+    private let examples: [SpokenLanguage: String] = [
+        .french: "Bonjour, comment allez-vous ?",
+        .english: "Hello, how are you?",
+        .spanish: "Hola, ¿cómo está?",
+        .mandarin: "你好，你好吗？",
+        .italian: "Ciao, come sta?",
+        .arabic: "مرحباً، كيف حالك؟",
+        .german: "Hallo, wie geht es Ihnen?"
+    ]
+
+    func sampleText(for language: SpokenLanguage) -> String {
+        examples[language] ?? ""
+    }
+
+    func translate(_ text: String, from: SpokenLanguage, to: SpokenLanguage) async throws -> String {
+        guard text == sampleText(for: from), let translated = examples[to] else {
+            throw TranslationError.demonstrationOnly
+        }
+        return translated
+    }
+}
+
 enum TranslationError: LocalizedError {
     case notConfigured
+    case demonstrationOnly
     var errorDescription: String? {
-        "Aucun service de traduction n'est configuré. Consultez README.md."
+        switch self {
+        case .notConfigured:
+            "Aucun service de traduction n'est configuré. Consultez README.md."
+        case .demonstrationOnly:
+            "Le mode Démonstration traduit uniquement la phrase de test. Utilisez « Phrase de test » ou configurez un service externe."
+        }
     }
 }
 
@@ -96,7 +127,7 @@ final class StereoSpeaker {
             if !isPrepared {
                 engine.attach(player)
                 engine.connect(player, to: engine.mainMixerNode, format: nil)
-                try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.allowBluetoothA2DP])
+                try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .spokenAudio, options: [.allowBluetooth, .allowBluetoothA2DP])
                 try AVAudioSession.sharedInstance().setActive(true)
                 try engine.start()
                 player.play()
