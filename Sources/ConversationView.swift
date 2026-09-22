@@ -34,10 +34,29 @@ struct ConversationView: View {
                     Button("Passer au tour suivant") { model.switchSpeaker() }
                         .frame(maxWidth: .infinity)
 
+                    Button("Phrase de test (stéréo)") { model.playDemonstration() }
+                        .frame(maxWidth: .infinity)
+
                     Text("1. Démarrer l'écoute · 2. Parler · 3. Passer au tour suivant.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                     Text(model.status).foregroundStyle(.secondary)
+                    if !model.liveTranscript.isEmpty {
+                        Text("Entendu : \(model.liveTranscript)")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Section("Traduction") {
+                    Picker("Mode", selection: $model.translationMode) {
+                        ForEach(TranslationMode.allCases) { Text($0.rawValue).tag($0) }
+                    }
+                    Text(model.translationMode == .demonstration
+                         ? "Le mode démonstration traduit uniquement la phrase de test."
+                         : "Nécessite un serveur de traduction configuré : aucune clé ne doit être placée dans l’app.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
                 }
 
                 Section("Historique") {
@@ -69,6 +88,5 @@ struct ConversationView: View {
 }
 
 private extension ConversationModel {
-    var captureButtonTitle: String { captureIsRunning ? "Arrêter l'écoute" : "Démarrer l'écoute" }
-    var captureIsRunning: Bool { status.hasPrefix("Écoute") || status == "Traduction…" }
+    var captureButtonTitle: String { isListening ? "Arrêter l'écoute" : "Démarrer l'écoute" }
 }
