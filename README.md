@@ -12,6 +12,17 @@ Projet SwiftUI destiné à être ouvert dans **Swift Playgrounds sur iPad** et s
 - synthèse vocale routée vers le canal gauche ou droit ;
 - historique des phrases.
 
+## Prototype immédiatement testable
+
+Le sélecteur **Mode** est réglé par défaut sur **Démonstration**. Utilisez
+**Phrase de test (stéréo)** : la phrase de l'interlocuteur actif est affichée,
+puis la phrase d'exemple de l'autre langue est prononcée dans le canal attribué
+à cet interlocuteur. Utilisez un casque stéréo pour vérifier la sortie.
+
+Ce mode ne traduit pas le texte libre et ne doit pas être présenté comme une
+traduction réelle. Le mode **Service externe** reste indisponible tant qu'un
+adaptateur sécurisé n'est pas configuré.
+
 ## Usage du micro
 
 Les interlocuteurs parlent chacun à leur tour. L'utilisateur sélectionne l'interlocuteur qui parle, démarre l'écoute, puis passe au tour suivant. Cette approche est adaptée à un unique microphone : il n'y a pas de besoin de séparation automatique de deux voix simultanées.
@@ -23,12 +34,13 @@ Les interlocuteurs parlent chacun à leur tour. L'utilisateur sélectionne l'int
 
 ## Ouvrir dans Swift Playgrounds
 
-1. Téléchargez/clônez ce dépôt sur l'iPad.
-2. Ouvrez `Package.swift` dans Swift Playgrounds.
+1. Dans **Working Copy**, clonez `antoinevivies-cloud/TraductuerMonoPhone`.
+2. Ouvrez le dossier du dépôt dans **Swift Playgrounds**, puis ouvrez `Package.swift`.
 3. Dans les réglages du projet, ajoutez les descriptions d'usage iOS :
    - `NSMicrophoneUsageDescription` : « Microphone requis pour la conversation. »
    - `NSSpeechRecognitionUsageDescription` : « Reconnaissance vocale requise pour la transcription. »
-4. Lancez l'appareil réel (la reconnaissance vocale ne fonctionne pas de façon fiable dans un aperçu).
+4. Lancez sur l'appareil réel (la reconnaissance vocale ne fonctionne pas de façon fiable dans un aperçu).
+5. Après une modification : revenez dans Working Copy, effectuez un commit puis un push. Codemagic recevra le nouveau commit.
 
 ## Codemagic
 
